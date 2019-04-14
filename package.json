@@ -1,6 +1,7 @@
 {
   "name": "contribudence",
   "version": "0.1.0",
+  "licence": "AGPL",
   "private": true,
   "dependencies": {
     "react": "^16.8.6",
