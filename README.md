@@ -25,7 +25,7 @@ The course materials also include in-depth guides and live exercises -- there ar
 
 - [step-2-2](https://github.com/frontarm/react-and-bacon/tree/step-2-2) - Build the landing page
 
-  * [Lesson Page (on Frontend Armory Pro)(https://frontarm.com/courses/react-and-bacon/styled-components/exercise-answer/)
+  * [Lesson Page (on Frontend Armory Pro)](https://frontarm.com/courses/react-and-bacon/styled-components/exercise-answer/)
 
 
 *New lessons are added to the [the course](https://frontarm.com/courses/react-and-bacon/) every week!*
