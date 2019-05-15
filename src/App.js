@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import styled, { css, keyframes, createGlobalStyle } from 'styled-components/macro';
+import { registerForNewsletter } from './firebase';
 
 const media = {
   smallPlus: (...args) => css`
@@ -193,51 +194,67 @@ function App() {
       return
     }
 
-    setBusy(!busy)
-    await new Promise(r => setTimeout(r, 500))
-    setDone(true)
+    setBusy(true)
+
+    try {
+      await registerForNewsletter({
+        email,
+      })
+      setDone(true)
+    }
+    catch (error) {
+      setBusy(false)
+      setError('')
+    }
   }
 
   return (
-    <div style={{ overflow: 'hidden' }}>
+    <div css={css`
+      overflow: hidden;
+    `}>
       <GlobalStyle />
-      <h1 css={css`
-        line-height: 70px;
-        text-align: center;
-        font-size: 0.35rem;
-        font-family: "Bungee Shade";
-
-        ${media.smallPlus`
-          font-size: 0.42rem;
-        `}
-        ${media.mediumPlus`
-          font-size: 0.8rem;
-          line-height: 100px;
-        `}
+      <header css={css`
+        background: linear-gradient(#ffffff 0%, #ffffff 60%, #f8fafa 95%);
+        padding: 1px 0;
       `}>
-        {Array.from(title).map((char, i) =>
-          <TitleCharacter
-            key={i}
-            char={char}
-            hue={Math.floor(360*i/title.length)}
-            i={i}
-            length={title.length}
-          />
-        )}
-      </h1>
-      <p css={css`
-        color: #666;
-        font-family: "Bungee Hairline", sans-serif;
-        text-align: center;
-        margin: 0;
+        <h1 css={css`
+          line-height: 70px;
+          text-align: center;
+          font-size: 0.35rem;
+          font-family: "Bungee Shade";
 
-        ${media.mediumPlus`
-          font-size: 1.5rem;
-          margin: 1rem 0 3rem;
-        `}
-      `}>
-        Open support for open source
-      </p>
+          ${media.smallPlus`
+            font-size: 0.42rem;
+          `}
+          ${media.mediumPlus`
+            font-size: 0.8rem;
+            line-height: 100px;
+          `}
+        `}>
+          {Array.from(title).map((char, i) =>
+            <TitleCharacter
+              key={i}
+              char={char}
+              hue={Math.floor(360*i/title.length)}
+              i={i}
+              length={title.length}
+            />
+          )}
+        </h1>
+        <p css={css`
+          color: #666;
+          font-family: "Bungee Hairline", sans-serif;
+          text-align: center;
+          margin: 0;
+
+          ${media.mediumPlus`
+            font-size: 1.5rem;
+            margin: 1rem 0 3rem;
+          `}
+        `}>
+          Open support for open source
+        </p>
+      </header>
       <Gutter>
         <Flippable
           side={done ? 'back' : 'front'}
