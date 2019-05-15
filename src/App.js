@@ -1,5 +1,5 @@
-import React from 'react';
-import styled, { css, createGlobalStyle } from 'styled-components/macro';
+import React, { useEffect, useState } from 'react';
+import styled, { css, keyframes, createGlobalStyle } from 'styled-components/macro';
 
 const media = {
   smallPlus: (...args) => css`
@@ -13,6 +13,17 @@ const media = {
     }
   `
 }
+
+const flickerAnimation = keyframes`
+  0%, 85% {
+    opacity: 1;
+    background-color: rgba(255, 255, 255, 0.2);
+  }
+  100% {
+    opacity: 1;
+    background-color: rgba(255, 255, 255, 0.6);
+  }
+`
 
 const GlobalStyle = createGlobalStyle`
   @import url('https://fonts.googleapis.com/css?family=Bungee+Hairline|Bungee+Shade|Raleway:400,700');
@@ -67,13 +78,49 @@ const Gutter = styled.div`
   margin: 1rem;
 `
 
+const TitleCharacter = ({ char, hue, i, length }) => {
+  let [animationDuration, setAnimationDuration] = useState(Math.random()*10+0.2)
+
+  useEffect(() => {
+    let interval = setInterval(() => {
+      setAnimationDuration(Math.random()*10 + 0.2)
+    }, 1500)
+    return () => {
+      clearInterval(interval)
+    }
+  })
+
+  let scale = Math.pow(Math.abs((length - 1)/2 - i)/1.5/(length-1) + 0.75, 1.3);
+
+  return (
+    <span css={css`
+      display: inline-block;
+      opacity: 0.3;
+      animation: ${flickerAnimation} ${i/18 + 0.2}s alternate ease infinite;
+      font-size: ${scale*5}em;
+      vertical-align: -0.65em;
+    `} style={{
+      animationDuration: animationDuration+'s',
+    }}>
+      <span css={css`
+        display: inline-block;
+        mix-blend-mode: hard-light;
+        color: hsl(${hue}, 60%, 47%);
+      `}>
+        {char}
+      </span>
+    </span>
+  )
+}
+
 function App() {
-  let title = "Contribudence"
+  let title = "C--ontribudence"
 
   return (
     <div className="App">
       <GlobalStyle />
       <h1 css={css`
+        line-height: 70px;
         text-align: center;
         font-size: 0.35rem;
         font-family: "Bungee Shade";
@@ -86,23 +133,14 @@ function App() {
           line-height: 100px;
         `}
       `}>
-        {Array.from(title).map((char, i) => {
-          let hue = Math.floor(360*i/title.length)
-
-          return (
-            <span
-              key={i}
-              css={css`
-                color: hsl(${hue}, 60%, 53%);
-                font-size: ${Math.pow(1 + Math.abs((title.length - 1)/2 - i)/(title.length-1)*3, 4)/16+4}em;
-                vertical-align: -0.67em;
-                text-shadow: 5px 5px 5px rgba(0, 0, 0, 0.1);
-                line-height: 70px;
-              `}>
-              {char}
-            </span>
-          )
-        })}
+        {Array.from(title).map((char, i) =>
+          <TitleCharacter
+            char={char}
+            hue={Math.floor(360*i/title.length)}
+            i={i}
+            length={title.length}
+          />
+        )}
       </h1>
       <p css={css`
         color: #666;
