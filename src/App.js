@@ -98,7 +98,7 @@ const TitleCharacter = ({ char, hue, i, length }) => {
       opacity: 0.3;
       animation: ${flickerAnimation} ${i/18 + 0.2}s alternate ease infinite;
       font-size: ${scale*5}em;
-      vertical-align: -0.65em;
+      vertical-align: -0.67em;
     `} style={{
       animationDuration: animationDuration+'s',
     }}>
