@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import styled, { css, keyframes, createGlobalStyle } from 'styled-components/macro';
 
 const media = {
@@ -90,10 +90,11 @@ const Flippable = ({ side, front, back, ...props }) =>
   </div>
 
 const StyledInput = styled.input`
-  border: 1px solid #e0e4e4;
+  border: 1px solid ${props => props.error ? 'hsl(45,30%,85%)' : '#e0e4e4'};
   border-radius: 10px;
   box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.05) inset;
   font-size: 1.2rem;
+  margin-bottom: 0.25rem;
   padding: 0.75rem;
   width: 100%;
   display: block;
@@ -105,6 +106,35 @@ const StyledInput = styled.input`
       0 0 1.5pt 1.5pt #4488dd;
   }
 `
+
+const Field = ({ error, hint, label, onChange, className, style, hidden, ...props }) =>
+  <div
+    className={className}
+    style={style}
+    hidden={hidden}>
+    <label css={css`
+      ${error && css`
+        color: hsl(45, 30%, 50%);
+      `}
+      font-weight: bold;
+      font-size: 90%;
+      line-height: 2rem;
+    `}>
+      Email
+      <StyledInput
+        {...props}
+        error={!!error}
+        onChange={event => onChange(event.target.value)}
+      />
+    </label>
+    <div css={css`
+      color: ${error ? 'hsl(45, 30%, 55%)' : 'hsl(0, 0%, 47%)'};
+      font-size: 90%;
+      line-height: 1.4rem;
+    `}>
+      {error || hint}
+    </div>
+  </div>
 
 const Gutter = styled.div`
   margin: 1rem;
@@ -146,6 +176,27 @@ function App() {
   let title = "Contribudence"
   let [busy, setBusy] = useState(false)
   let [done, setDone] = useState(false)
+  let [email, setEmail] = useState('')
+  let [error, setError] = useState(null)
+
+  let hasValidEmail = /.+@.+\..+/.test(email)
+
+  let handleSubmit = async event => {
+    event.preventDefault()
+
+    if (!hasValidEmail) {
+      setError(
+        !email ? "Thanks! Please enter an email to get started." :
+        !hasValidEmail ? "I can't send to that email. Did you enter it correctly?" :
+        null
+      )
+      return
+    }
+
+    setBusy(!busy)
+    await new Promise(r => setTimeout(r, 500))
+    setDone(true)
+  }
 
   return (
     <div style={{ overflow: 'hidden' }}>
@@ -192,46 +243,48 @@ function App() {
           side={done ? 'back' : 'front'}
           front={
             <NarrowCard>
-              <p><strong>A bright, new and cheerful way to support open source.</strong></p>
-              <p>We're launching soon, so enter your email below to be the first to get in on the deal!</p>
-              <hr css={css`
-                border: none;
-                height: 1px;
-                background-color: #f0f4f4;
-                margin: 1.5rem;
-              `} />
-              <label css={css`
-                font-weight: bold;
-                font-size: 90%;
-                line-height: 2rem;
-              `}>
-                Email
-                <StyledInput
+              <form onClick={handleSubmit}>
+                <p><strong>A bright, new and cheerful way to support open source.</strong></p>
+                <p>We're launching soon, so enter your email below to be the first to get in on the deal!</p>
+                <hr css={css`
+                  border: none;
+                  height: 1px;
+                  background-color: #f0f4f4;
+                  margin: 1.5rem;
+                `} />
+                <Field
                   autoFocus
-                  type="email"
+                  error={error}
+                  label='Email'
+                  type='email'
+                  value={email}
+                  onChange={setEmail}
                 />
-              </label>
-              <Button
-                busy={busy}
-                // disabled={busy}
-                label="I want to contribute"
-                onClick={async () => {
-                  setBusy(!busy)
-                  await new Promise(r => setTimeout(r, 500))
-                  setDone(true)
-                }}
-              />
+                <Button
+                  busy={busy}
+                  disabled={busy}
+                  label="I want to contribute"
+                  type="submit"
+                />
+              </form>
             </NarrowCard>
           }
           back={
             <NarrowCard css={css`
               position: absolute;
+              display: flex;
+              flex-direction: column;
+              justify-content: center;
+              text-align: center;
               height: 100%;
               width: 100%;
               left: 50%;
               transform: translateX(-50%);
             `}>
-
+              <h2>Thanks, Mate!</h2>
+              <p>
+                You'll be hearing from us as soon as we're ready to launch.
+              </p>
             </NarrowCard>
           }
         />
