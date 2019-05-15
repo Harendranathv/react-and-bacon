@@ -1,5 +1,7 @@
 # React & Bacon
 
+**This is the WIP branch. It contains code that has not yet been added to the course, and that may change. Instead of basing your app on this branch, I recommend using the [master](/frontarm/react-and-bacon/) branch.**
+
 This project is the companion repository for the [React & Bacon](https://frontarm.com/courses/react-and-bacon/) course on [Frontend Armory](https://frontarm.com).
 
 Each branch corresponds to one of the course's walkthrough videos. Some of these videos are freely available on YouTube, while others require a subsription to the course. I've linked both the YouTube videos (for free sections) and Lesson pages on Frontend Armory associated with each branch.

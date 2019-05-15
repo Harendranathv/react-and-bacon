@@ -142,7 +142,7 @@ const Gutter = styled.div`
 `
 
 const scanAnimation = keyframes`
-  0%, 80% {
+  0%, 70% {
     opacity: 1;
     background-color: rgba(255, 255, 255, 0.2);
   }
@@ -318,7 +318,7 @@ function App() {
           color: #aab;
         }
       `}>
-        View this site's <a href="https://github.com/frontarm/react-and-bacon">source at GitHub</a>. Learn to build it with <a href="http://frontarm.com/courses/react-and-bacon">React &amp; Bacon</a>.
+        View this site's <a href="https://github.com/frontarm/react-and-bacon/tree/wip">source at GitHub</a>. Learn to build it with <a href="http://frontarm.com/courses/react-and-bacon">React &amp; Bacon</a>.
         Copyright &copy; 2019 Seven Stripes Kabushiki Kaisha
       </footer>
     </div>
