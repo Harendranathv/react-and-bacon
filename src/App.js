@@ -243,7 +243,7 @@ function App() {
           side={done ? 'back' : 'front'}
           front={
             <NarrowCard>
-              <form onClick={handleSubmit}>
+              <form onSubmit={handleSubmit}>
                 <p><strong>A bright, new and cheerful way to support open source.</strong></p>
                 <p>We're launching soon, so enter your email below to be the first to get in on the deal!</p>
                 <hr css={css`
@@ -325,6 +325,13 @@ const Button = ({ busy, color='#38d86c', label, ...props }) =>
     margin: 1rem auto;
     padding: 0 3.5rem 0 1.5rem;
     position: relative;
+    opacity: 1;
+    transition: opacity 100ms ease-out;
+
+    &[disabled] {
+      cursor: default;
+      opacity: 0.8;
+    }
 
     &:focus {
       outline: none;
