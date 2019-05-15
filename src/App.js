@@ -14,17 +14,6 @@ const media = {
   `
 }
 
-const flickerAnimation = keyframes`
-  0%, 85% {
-    opacity: 1;
-    background-color: rgba(255, 255, 255, 0.2);
-  }
-  100% {
-    opacity: 1;
-    background-color: rgba(255, 255, 255, 0.6);
-  }
-`
-
 const GlobalStyle = createGlobalStyle`
   @import url('https://fonts.googleapis.com/css?family=Bungee+Hairline|Bungee+Shade|Raleway:400,700');
 
@@ -57,6 +46,49 @@ const Card = styled.div`
   `}
 `
 
+const NarrowCard = styled(Card)`
+  color: #445;
+  margin: 0 auto;
+  max-width: 340px;
+  ${media.mediumPlus`
+    max-width: 350px;
+  `}
+`
+
+const FlippableSide = styled.div`
+  backface-visibility: hidden;
+`
+
+// https://davidwalsh.name/css-flip
+const Flippable = ({ side, front, back, ...props }) =>
+  <div {...props} css={css`
+    perspective: 2500px;
+  `}>
+    <div css={css`
+      transition: transform 500ms cubic-bezier(0.770, 0.000, 0.175, 1.000);
+      transform-style: preserve-3d;
+      position: relative;
+      transform: rotateY(${side === 'back' ? 180 : 0}deg);
+    `}>
+      <FlippableSide css={css`
+        z-index: 2;
+        transform: rotateY(0deg);
+      `}>
+        {front}
+      </FlippableSide>
+      <FlippableSide css={css`
+        position: absolute;
+        transform: rotateY(180deg);
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+      `}>
+        {back}
+      </FlippableSide>
+    </div>
+  </div>
+
 const StyledInput = styled.input`
   border: 1px solid #e0e4e4;
   border-radius: 10px;
@@ -78,30 +110,27 @@ const Gutter = styled.div`
   margin: 1rem;
 `
 
+const scanAnimation = keyframes`
+  0%, 80% {
+    opacity: 1;
+    background-color: rgba(255, 255, 255, 0.2);
+  }
+  100% {
+    opacity: 1;
+    background-color: rgba(255, 255, 255, 0.8);
+  }
+`
+
 const TitleCharacter = ({ char, hue, i, length }) => {
-  let [animationDuration, setAnimationDuration] = useState(Math.random()*10+0.2)
-
-  useEffect(() => {
-    let interval = setInterval(() => {
-      setAnimationDuration(Math.random()*10 + 0.2)
-    }, 1500)
-    return () => {
-      clearInterval(interval)
-    }
-  })
-
-  let scale = Math.pow(Math.abs((length - 1)/2 - i)/1.5/(length-1) + 0.75, 1.3);
-
   return (
     <span css={css`
       display: inline-block;
-      opacity: 0.3;
-      animation: ${flickerAnimation} ${i/18 + 0.2}s alternate ease infinite;
-      font-size: ${scale*5}em;
+      opacity: 1;
+      background-color: rgba(255, 255, 255, 0.2);
+      animation: ${scanAnimation} 1s ${i/18 + 0.2}s alternate ease infinite;      
+      font-size: ${Math.pow(1 + Math.abs((length - 1)/2 - i)/(length-1)*3, 4)/16+4}em;
       vertical-align: -0.67em;
-    `} style={{
-      animationDuration: animationDuration+'s',
-    }}>
+    `}>
       <span css={css`
         display: inline-block;
         mix-blend-mode: hard-light;
@@ -115,9 +144,11 @@ const TitleCharacter = ({ char, hue, i, length }) => {
 
 function App() {
   let title = "Contribudence"
+  let [busy, setBusy] = useState(false)
+  let [done, setDone] = useState(false)
 
   return (
-    <div className="App">
+    <div style={{ overflow: 'hidden' }}>
       <GlobalStyle />
       <h1 css={css`
         line-height: 70px;
@@ -135,6 +166,7 @@ function App() {
       `}>
         {Array.from(title).map((char, i) =>
           <TitleCharacter
+            key={i}
             char={char}
             hue={Math.floor(360*i/title.length)}
             i={i}
@@ -156,84 +188,53 @@ function App() {
         Open support for open source
       </p>
       <Gutter>
-        <Card css={css`
-          margin: 2rem auto;
-          max-width: 340px;
-          color: #445;
-
-          ${media.mediumPlus`
-            max-width: 350px;
-          `}
-        `}>
-          <p><strong>A bright, new and cheerful way to support open source.</strong></p>
-          <p>We're launching soon, so enter your email below to be the first to get in on the deal!</p>
-          <hr css={css`
-            border: none;
-            height: 1px;
-            background-color: #f0f4f4;
-            margin: 1.5rem;
-          `} />
-          <label css={css`
-            font-weight: bold;
-            font-size: 90%;
-            line-height: 2rem;
-          `}>
-            Email
-            <StyledInput
-              autoFocus
-              type="email"
-            />
-          </label>
-          <button css={css`
-            background-color: #33d833;
-            background: linear-gradient(#83d8a0,#38d86c);
-            border: 1px solid #3cdd6f;
-            border-radius: 2rem;
-            box-shadow: 0 0.25rem 1rem -0.25rem rgba(218,59,130,.5);
-            color: white;
-            cursor: pointer;
-            display: block;
-            line-height: 2rem;
-            height: 3rem;
-            font-weight: 500;
-            font-family: Raleway;
-            font-size: 1rem;
-            margin: 1rem auto;
-            padding: 0 3.5rem 0 1.5rem;
-            position: relative;
-
-            &:focus {
-              outline: none;
-              box-shadow: 0 0 1.5pt 1.5pt #4488dd;
-            }
-
-            &:hover {
-              background: linear-gradient(#38d86c, #83d8a0);
-            }
-          `}>
-            I want to contribute
-            <div css={css`
-              background-color: white;
-              border-radius: 50%;
-              width: 2rem;
-              height: 2rem;
-              position: absolute;
-              right: 0.5rem;
-              top: 50%;
-              transform: translateY(-50%);
-              box-shadow:
-                inset 0 0 1px #3cdd6f,
-                inset 0 1px 4px 0 rgba(146, 146, 186, 0.8);
-            `}>
-              <RightArrow css={css`
-                position: absolute;
-                left: 50%;
-                top: 50%;
-                transform: translate(-50%, -50%); 
+        <Flippable
+          side={done ? 'back' : 'front'}
+          front={
+            <NarrowCard>
+              <p><strong>A bright, new and cheerful way to support open source.</strong></p>
+              <p>We're launching soon, so enter your email below to be the first to get in on the deal!</p>
+              <hr css={css`
+                border: none;
+                height: 1px;
+                background-color: #f0f4f4;
+                margin: 1.5rem;
               `} />
-            </div>
-          </button>
-        </Card>
+              <label css={css`
+                font-weight: bold;
+                font-size: 90%;
+                line-height: 2rem;
+              `}>
+                Email
+                <StyledInput
+                  autoFocus
+                  type="email"
+                />
+              </label>
+              <Button
+                busy={busy}
+                // disabled={busy}
+                label="I want to contribute"
+                onClick={async () => {
+                  setBusy(!busy)
+                  await new Promise(r => setTimeout(r, 500))
+                  setDone(true)
+                }}
+              />
+            </NarrowCard>
+          }
+          back={
+            <NarrowCard css={css`
+              position: absolute;
+              height: 100%;
+              width: 100%;
+              left: 50%;
+              transform: translateX(-50%);
+            `}>
+
+            </NarrowCard>
+          }
+        />
       </Gutter>
       <footer css={css`
         line-height: 1.8rem;
@@ -254,10 +255,159 @@ function App() {
   );
 }
 
-const RightArrow = (props) =>
-  <svg {...props} width="30px" height="30px" viewBox="0 0 30 30" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink">
+const Button = ({ busy, color='#38d86c', label, ...props }) =>
+  <button {...props} css={css`
+    background: ${color} linear-gradient(rgba(255, 255, 255, 0.08), rgba(0, 0, 0, 0.08));
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 2rem;
+    box-shadow: 0 0.25rem 1rem -0.25rem rgba(218,59,130,.5);
+    color: white;
+    cursor: pointer;
+    display: block;
+    line-height: 2rem;
+    height: 3rem;
+    font-weight: 500;
+    font-family: Raleway;
+    font-size: 1rem;
+    margin: 1rem auto;
+    padding: 0 3.5rem 0 1.5rem;
+    position: relative;
+
+    &:focus {
+      outline: none;
+      box-shadow:
+        0 0 1.5pt 1.5pt #4488dd,
+        0 0.25rem 1rem -0.25rem rgba(218,59,130,.5);
+    }
+
+    &:hover {
+      background: ${color} linear-gradient(rgba(255, 255, 255, 0.15), rgba(0, 0, 0, 0.1));
+    }
+
+    &:active {
+      background-image: linear-gradient(rgba(0, 0, 0, 0.1), rgba(255, 255, 255, 0.15));
+    }
+  `}>
+    {label}
+    <div css={css`
+      background-color: white;
+      border-radius: 50%;
+      width: 2rem;
+      height: 2rem;
+      position: absolute;
+      right: 0.5rem;
+      top: 50%;
+      transform: translateY(-50%);
+      box-shadow:
+        inset 0 0 1px #3cdd6f,
+        inset 0 1px 4px 0 rgba(146, 146, 186, 0.8);
+      overflow: hidden;
+    `}>
+      <Spinner active={busy} css={css`
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        transition: opacity 500ms cubic-bezier(0.770, 0.000, 0.175, 1.000);
+        transition-delay: ${busy ? 150 : 0}ms;
+        opacity: ${busy ? 1 : 0};
+      `} />
+      <RightArrow css={css`
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        opacity: 1;
+        transform: translate(-50%, -50%);
+        ${busy ? css`
+          transform: translate(-150%, -50%);
+          animation: ${arrowAnimation} 350ms cubic-bezier(0.895, 0.030, 0.635, 0.220);
+        ` : css`
+          transition:
+            transform 300ms cubic-bezier(0.165, 0.840, 0.440, 1.000),
+            opacity 250ms cubic-bezier(0.165, 0.840, 0.440, 1.000);
+        `}
+      `} />
+    </div>
+  </button>
+
+const arrowAnimation = keyframes`
+  0% {
+    transform: translate(-50%, -50%);
+    opacity: 1;
+  }
+  90% {
+    opacity: 0;
+    transform: translate(50%, -50%);
+  }
+  99% {
+    transform: translate(50%, -50%);
+  }
+  100% {
+    transform: translate(-150%, -50%);
+  }
+`
+
+const spinnerAnimation = keyframes`
+  0% {
+    transform: rotate(0deg);
+  }
+  90% {
+    transform: rotate(350deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+`
+
+// https://projects.lukehaas.me/css-loaders/
+const Spinner = ({ active, color='#aabbcc', backgroundColor='#fff', ...props }) =>
+  <div {...props} css={css`
+    border-radius: 50%;
+    display: block;
+    width: 50%;
+    height: 50%;
+    box-shadow: inset 0 0 0 2px ${color};
+  `}>
+    <div css={css`
+      position: absolute;
+      width: calc(50% + 1.5px);
+      height: calc(100% + 3px);
+      background-color: ${backgroundColor};
+      border-radius: 9999px 0 0 9999px;
+      top: -1px;
+      left: -1px;
+      transform-origin: calc(100% - 0.5px) calc(50%);
+      ${active && css`
+        animation: ${spinnerAnimation} 1.2s infinite cubic-bezier(0.5, 0, 0.5, 1) 0.32s;
+      `}
+    `} />
+    <div css={css`
+      position: absolute;
+      width: calc(50% + 1.5px);
+      height: calc(100% + 3px);
+      background-color: ${backgroundColor};
+      border-radius: 0 9999px 9999px 0;
+      top: -1px;
+      left: calc(50% - 0.5px);
+      transform-origin: 0 calc(50%);
+      ${active && css`
+        animation: ${spinnerAnimation} 1.2s infinite cubic-bezier(0.5, 0, 0.5, 1);
+      `}
+    `} />
+  </div>
+
+const RightArrow = ({ ...props }) =>
+  <svg
+    {...props}
+    css={css``} // For some reason, styled-components fails without this.
+    width="30px"
+    height="30px"
+    viewBox="0 0 30 30"
+    version="1.1"
+    xmlns="http://www.w3.org/2000/svg"
+    xmlnsXlink="http://www.w3.org/1999/xlink">
     <g stroke="none" strokeWidth="1" fill="none" fillRule="evenodd" opacity="0.933243937" strokeLinecap="round">
-      <g transform="translate(-178.000000, -21.000000)" stroke="#8A8AB5" strokeWidth="3">
+      <g transform="translate(-178.000000, -21.000000)" stroke="#777788" strokeWidth="3">
         <g>
           <g transform="translate(169.000000, 8.000000)">
             <g transform="translate(16.500000, 21.500000)">
