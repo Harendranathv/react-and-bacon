@@ -114,7 +114,7 @@ const TitleCharacter = ({ char, hue, i, length }) => {
 }
 
 function App() {
-  let title = "C--ontribudence"
+  let title = "Contribudence"
 
   return (
     <div className="App">
